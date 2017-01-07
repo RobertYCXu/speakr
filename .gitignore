@@ -13,8 +13,5 @@ build/
 .idea/
 *.iml
 
-# Gradle generated files
-.gradle/
-
 # Local config (e.g. sdk path)
 local.properties
