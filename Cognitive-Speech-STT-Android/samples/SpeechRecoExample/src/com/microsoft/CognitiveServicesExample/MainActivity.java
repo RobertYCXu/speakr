@@ -51,6 +51,7 @@ import com.microsoft.cognitiveservices.speechrecognition.RecognitionStatus;
 import com.microsoft.cognitiveservices.speechrecognition.SpeechRecognitionMode;
 import com.microsoft.cognitiveservices.speechrecognition.SpeechRecognitionServiceFactory;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends Activity implements ISpeechRecognitionServerEvents
@@ -317,6 +318,8 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         if (!isFinalDicationMessage) {
             this.WriteLine("********* Final n-BEST Results *********");
             for (int i = 0; i < response.Results.length; i++) {
+//                This is where the DataProcessed
+//                TODO: instantiate the repeated word, filler word, and speed logic objects
                 this.WriteLine("[" + i + "]" + " Confidence=" + response.Results[i].Confidence +
                         " Text=\"" + response.Results[i].DisplayText + "\"");
             }
@@ -336,6 +339,11 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
 
     public void onPartialResponseReceived(final String response) {
         this.WriteLine("--- Partial result received by onPartialResponseReceived() ---");
+//      TODO: check if # of words in this string is the same in prevString, if so, then do nothing.
+//            Else, SAVE TIME and current size of string
+//      ** Also check if > 1 word is added (if response.length - olderStr.length > 1) then set then
+//         divide the time in between be n # of words added to last time!
+        //ArrayList<Long> timeList = new ArrayList<>();
         this.WriteLine(response);
         this.WriteLine();
     }
