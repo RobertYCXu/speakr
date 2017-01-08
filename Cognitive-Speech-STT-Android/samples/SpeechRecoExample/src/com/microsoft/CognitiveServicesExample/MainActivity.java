@@ -343,7 +343,6 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
 //            Else, SAVE TIME and current size of string
 //      ** Also check if > 1 word is added (if response.length - olderStr.length > 1) then set then
 //         divide the time in between be n # of words added to last time!
-        //ArrayList<Long> timeList = new ArrayList<>();
         this.WriteLine(response);
         this.WriteLine();
     }
