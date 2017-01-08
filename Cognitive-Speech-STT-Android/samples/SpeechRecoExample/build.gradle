@@ -8,7 +8,7 @@ repositories {
 }
 dependencies {
     compile 'com.microsoft.projectoxford:speechrecognition:1.1.0'
-
+    compile 'com.android.support:design:22.2.0'
 }
 
 android {
