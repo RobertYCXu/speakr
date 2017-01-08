@@ -95,9 +95,10 @@ public class ResultsActivity extends Activity {
         graphView = (GraphView)findViewById(R.id.results_speed_graph);
         ArrayList<DataPoint> dataPoints = new ArrayList<>();
         for (int i = 0; i < size; i++){
-            dataPoints.add(new DataPoint(i*3, mSpeedList.get(i)));
+            dataPoints.add(new DataPoint((i+1)*2, mSpeedList.get(i)));
         }
         LineGraphSeries<DataPoint> graphSeries = new LineGraphSeries<>((DataPoint[]) dataPoints.toArray(new DataPoint[size]));
+        graphView.setTitle("Letters Spoken per Second");
         graphView.addSeries(graphSeries);
     }
 

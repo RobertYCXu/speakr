@@ -36,18 +36,13 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
@@ -75,7 +70,6 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
 {
     private long mRecordingStartTime;
 
-    int m_waitSeconds = 200;
     ArrayList<StringSpeed> mSpeedList = new ArrayList<>();
     DataRecognitionClient dataClient = null;
     MicrophoneRecognitionClient micClient = null;
@@ -97,21 +91,6 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         return this.getString(R.string.primaryKey);
     }
 
-    /**
-     * Gets the LUIS application identifier.
-     * @return The LUIS application identifier.
-     */
-    private String getLuisAppId() {
-        return this.getString(R.string.luisAppID);
-    }
-
-    /**
-     * Gets the LUIS subscription identifier.
-     * @return The LUIS subscription identifier.
-     */
-    private String getLuisSubscriptionID() {
-        return this.getString(R.string.luisSubscriptionID);
-    }
 
     /**
      * Gets a value indicating whether or not to use the microphone.
@@ -149,14 +128,6 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         this.mLogoutButton = (Button)findViewById(R.id.button_logout);
         this.mLiveParseTV = (TextView)findViewById(R.id.activity_main_live_parse_tv);
 
-        if (getString(R.string.primaryKey).startsWith("Please")) {
-            new AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.add_subscription_key_tip_title))
-                    .setMessage(getString(R.string.add_subscription_key_tip))
-                    .setCancelable(false)
-                    .show();
-        }
-
         // setup the buttons
         final MainActivity This = this;
         this.mRecordButton.setOnClickListener(new OnClickListener() {
@@ -176,39 +147,43 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
             }
         });
 
+
     }
 
     /**
      * Handles the Click event of the mRecordButton control.
      */
     private void StartButton_Click(View arg0) {
-        this.mRecordButton.setEnabled(false);
+        if (mRecordButton.getText().equals("Record")){
 
-        Log.wtf("Recog", "recog started");//this.LogRecognitionStart();
-        if (mSpeedList != null && !mSpeedList.isEmpty()){
-            mSpeedList.clear();
-        }
-        //dim screen
-        animateRecord(1);
+            mViewResults.setVisibility(View.GONE);
+            mViewResults.setEnabled(false);
 
-
-        if (this.getUseMicrophone()) {
-            if (this.micClient == null) {
-                {
-                    this.micClient = SpeechRecognitionServiceFactory.createMicrophoneClient(
-                            this,
-                            this.getMode(),
-                            this.getDefaultLocale(),
-                            this,
-                            this.getPrimaryKey());
-                }
+            Log.wtf("Recog", "recog started");//this.LogRecognitionStart();
+            if (mSpeedList != null && !mSpeedList.isEmpty()){
+                mSpeedList.clear();
             }
+            //dim screen
+            animateRecord(1);
 
-            this.micClient.startMicAndRecognition();
-        }
-        else
-        {
-            if (null == this.dataClient) { {
+
+            if (this.getUseMicrophone()) {
+                if (this.micClient == null) {
+                    {
+                        this.micClient = SpeechRecognitionServiceFactory.createMicrophoneClient(
+                                this,
+                                this.getMode(),
+                                this.getDefaultLocale(),
+                                this,
+                                this.getPrimaryKey());
+                    }
+                }
+
+                this.micClient.startMicAndRecognition();
+            }
+            else
+            {
+                if (null == this.dataClient) { {
                     this.dataClient = SpeechRecognitionServiceFactory.createDataClient(
                             this,
                             this.getMode(),
@@ -216,7 +191,10 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
                             this,
                             this.getPrimaryKey());
                 }
+                }
             }
+        } else {
+            micClient.endMicAndRecognition();
         }
     }
 
@@ -226,29 +204,25 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         AnimatorSet animationSet = new AnimatorSet();
         List<Animator> animationList = new ArrayList<>();
 
-        ObjectAnimator viewDimmer, recordDimmer, historyDimmer, logoutDimmer;
+        ObjectAnimator viewDimmer, historyDimmer, logoutDimmer;
         if (inputNum == 1){
             mCurrentlyDimmed = true;
             //here
             viewDimmer = ObjectAnimator.ofFloat(mDimView, "alpha", 0, 0.8f);
-            recordDimmer = ObjectAnimator.ofFloat(mRecordButton, "alpha", 1f, 0.2f);
+            mRecordButton.setText("Stop");
             historyDimmer = ObjectAnimator.ofFloat(mHistoryButton, "alpha", 1f, 0.2f);
             logoutDimmer = ObjectAnimator.ofFloat(mLogoutButton, "alpha", 1f, 0.2f);
         } else {
             mCurrentlyDimmed = false;
             //here
             viewDimmer = ObjectAnimator.ofFloat(mDimView, "alpha", 0.8f, 0);
-            recordDimmer = ObjectAnimator.ofFloat(mRecordButton, "alpha", 0.2f, 1);
+            mRecordButton.setText("Record");
             historyDimmer = ObjectAnimator.ofFloat(mHistoryButton, "alpha", 0.2f, 1);
             logoutDimmer = ObjectAnimator.ofFloat(mLogoutButton, "alpha", 0.2f, 1f);
         }
         viewDimmer.setDuration(100);
         viewDimmer.setInterpolator(new LinearInterpolator());
         animationList.add(viewDimmer);
-
-        recordDimmer.setDuration(100);
-        recordDimmer.setInterpolator(new LinearInterpolator());
-        animationList.add(recordDimmer);
 
         historyDimmer.setDuration(100);
         historyDimmer.setInterpolator(new LinearInterpolator());
@@ -275,7 +249,6 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
 
         if (isFinalDicationMessage) {
             micClient.endMicAndRecognition();
-            this.mRecordButton.setEnabled(true);
             this.isReceivedResponse = FinalResponseStatus.OK;
         }
 
@@ -289,12 +262,9 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
             //    This is where the DataProcessed
 
             micClient.endMicAndRecognition();
-            mRecordButton.setEnabled(true);
 
             if (response.Results.length > 0){
                 //    instantiate the repeated word, filler word, and speed logic objects
-                //TODO: PUBLISH TO UI
-                //TODO: get live speed graph data (array)
 
                 String finalPredictedString = response.Results[0].DisplayText;
                 final int speed = StringSpeed.overallSpeed(
@@ -325,7 +295,6 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
                 mViewResults.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        //TODO: GO TO RESULTS ACTIVITY
                         Log.wtf("Results selected", "go to results");
 
                         Intent resultsIntent = new Intent(MainActivity.this, ResultsActivity.class);
@@ -370,7 +339,6 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
     }
 
     public void onError(final int errorCode, final String response) {
-        this.mRecordButton.setEnabled(true);
         Log.wtf("Error", "--- Error received by onError() ---");
         Log.wtf("Error", "Error code: " + SpeechClientStatus.fromInt(errorCode) + " " + errorCode);
         Snackbar.make(null, "Error: "+response, Snackbar.LENGTH_LONG).show();
@@ -390,9 +358,10 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         }
 
         if (!recording) {
+            //DO NOT END
             //ENDED!
             this.micClient.endMicAndRecognition();
-            this.mRecordButton.setEnabled(true);
+            this.mRecordButton.setText("Record");
         }
     }
 

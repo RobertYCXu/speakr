@@ -27,7 +27,7 @@ public class StringSpeed {
         // ver: time per interval
         int timePerDiv = 3000;
         // var: number of intervals to analyze
-        long nDiv = totalTime / 3000 + 1; // 3 seconds
+        long nDiv = totalTime / 2000 + 1; // 3 seconds
 
         // removes corrections generated
         // kinda bad because considers the first word recognised as the right one and not the last
