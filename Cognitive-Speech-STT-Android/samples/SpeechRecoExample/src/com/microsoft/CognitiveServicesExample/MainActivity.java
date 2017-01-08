@@ -147,6 +147,15 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
             }
         });
 
+        mLogoutButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!mCurrentlyDimmed){
+                    onBackPressed();
+                }
+            }
+        });
+
 
     }
 
