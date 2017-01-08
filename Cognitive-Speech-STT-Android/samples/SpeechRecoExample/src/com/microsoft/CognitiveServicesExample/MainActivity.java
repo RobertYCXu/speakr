@@ -34,15 +34,14 @@ package com.microsoft.CognitiveServicesExample;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioGroup;
 
 import com.microsoft.bing.speech.SpeechClientStatus;
 import com.microsoft.cognitiveservices.speechrecognition.DataRecognitionClient;
@@ -62,8 +61,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
     DataRecognitionClient dataClient = null;
     MicrophoneRecognitionClient micClient = null;
     FinalResponseStatus isReceivedResponse = FinalResponseStatus.NotReceived;
-    EditText _logText;
-    Button _startButton;
+    FloatingActionButton _startButton;
 
     public enum FinalResponseStatus { NotReceived, OK, Timeout }
 
@@ -119,9 +117,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        this._logText = (EditText) findViewById(R.id.editText1);
-        this._startButton = (Button) findViewById(R.id.button1);
+        this._startButton = (FloatingActionButton) findViewById(R.id.button1);
 
         if (getString(R.string.primaryKey).startsWith("Please")) {
             new AlertDialog.Builder(this)
