@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:id="@+id/button2" />
+        android:id="@+id/buttonStop" />
 
     <TextView
         android:text="speed"
@@ -23,16 +23,16 @@
         android:layout_height="wrap_content"
         android:id="@+id/speedData"
         android:layout_marginTop="162dp"
-        android:layout_below="@+id/button2"
-        android:layout_toStartOf="@+id/button2" />
+        android:layout_below="@+id/buttonStop"
+        android:layout_toStartOf="@+id/buttonStop" />
 
     <TextView
         android:text="fillerword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/speedData"
-        android:layout_alignRight="@+id/button2"
-        android:layout_alignEnd="@+id/button2"
+        android:layout_alignRight="@+id/buttonStop"
+        android:layout_alignEnd="@+id/buttonStop"
         android:layout_marginRight="75dp"
         android:layout_marginEnd="75dp"
         android:layout_marginTop="29dp"

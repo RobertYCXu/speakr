@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/score_image"
+        android:layout_margin="16dp"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:src="#23395B" />
+    <TextView
+        android:id="@+id/score_item_tv"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="42%"
+    android:textColor="@android:color/white"
+    android:layout_centerVertical="true"
+    android:layout_marginLeft="12dp"
+    style="@style/Base.TextAppearance.AppCompat.Body2"
+    android:textSize="18sp"
+    android:layout_alignLeft="@id/score_image"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Today"
+        android:textColor="@android:color/black"
+        android:layout_centerVertical="true"
+        style="@style/Base.TextAppearance.AppCompat.Body2"
+        android:textSize="18sp"
+        android:layout_toRightOf="@id/score_image"/>
+
+</RelativeLayout>

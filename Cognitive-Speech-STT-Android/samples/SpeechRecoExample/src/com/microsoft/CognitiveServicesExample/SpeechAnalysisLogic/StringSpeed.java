@@ -1,5 +1,7 @@
 package com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic;
 
+import java.util.ArrayList;
+
 /**
  * Created by Akshay on 2017-01-07.
  */
@@ -11,6 +13,47 @@ public class StringSpeed {
     public StringSpeed (String s, Long time) {
         this.s = s;
         this.time = time;
+    }
+
+    public static ArrayList<Integer> getTimeData (ArrayList<StringSpeed> input) {
+        // handle if input is empty
+        if (input.size() == 0) {
+            return new ArrayList<Integer>();
+        }
+
+        // var: total time in milliseconds
+        long totalTime = (long) (input.get(input.size() - 1).time - input.get(0).time);
+
+        // ver: time per interval
+        int timePerDiv = 3000;
+        // var: number of intervals to analyze
+        long nDiv = totalTime / 3000 + 1; // 3 seconds
+
+        // removes corrections generated
+        // kinda bad because considers the first word recognised as the right one and not the last
+        // not too bad tho because corrections have approx same number of characters
+        for (int i = 0; i <= input.size() - 1; i++) {
+            while (i != input.size()-1 && countWords(input.get(i + 1).s) <= countWords(input.get(i).s)) {
+                input.remove(i + 1);
+            }
+            input.set(i, new StringSpeed(input.get(i).s.replaceAll("\\s+",""), input.get(i).time)); //removes spaces and periods
+        }
+
+        // characters in each interval is 0 before analyzing;
+        ArrayList<Integer> charInInterval = new ArrayList<Integer>();
+        for (int i = 0; i < nDiv; i++) {
+            charInInterval.add(0);
+        }
+
+        String lastCountedString = "";
+        for (int i = 0; i < input.size(); i++) {
+            if (!input.get(i).s.equals("")) {
+                charInInterval.set((int)(input.get(i).time - input.get(0).time)/timePerDiv, charInInterval.get((int)(input.get(i).time - input.get(0).time)/timePerDiv) + (input.get(i).s.length() - lastCountedString.length()));
+                lastCountedString = input.get(i).s;
+            }
+        }
+
+        return charInInterval;
     }
 
     // time is in milliseconds

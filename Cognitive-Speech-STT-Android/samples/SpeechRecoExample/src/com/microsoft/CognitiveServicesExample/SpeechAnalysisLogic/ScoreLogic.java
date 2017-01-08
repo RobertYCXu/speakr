@@ -32,7 +32,9 @@ public class ScoreLogic {
         }
 
         //subtract the % of repeated words (to total words)
-        percentScore -= (100*numOfRepeatedWords)/(StringSpeed.countWords(finalString));
+        if (StringSpeed.countWords(finalString) > 0){
+            percentScore -= (100*numOfRepeatedWords)/(StringSpeed.countWords(finalString));
+        }
 
         //subtract % filler words (to total words)
         percentScore -= percentFillerWords;

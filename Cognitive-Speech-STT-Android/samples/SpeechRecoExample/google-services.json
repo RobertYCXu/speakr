@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "215678257693",
+    "firebase_url": "https://cognitive-speech-stt-android.firebaseio.com",
+    "project_id": "cognitive-speech-stt-android",
+    "storage_bucket": "cognitive-speech-stt-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:215678257693:android:d5af76a0244b1d8b",
+        "android_client_info": {
+          "package_name": "com.microsoft.CognitiveServicesExample"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "215678257693-o16r5fehga4rpg4knbaetbi5hc6tplro.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.microsoft.CognitiveServicesExample",
+            "certificate_hash": "A738B8DF62B2B0616356F25015477786395ECCD6"
+          }
+        },
+        {
+          "client_id": "215678257693-gtc92o38m01785m09qn6s35874p7rb5j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDF5tKyQKBsP_ulDyUwNatMCvjpWDuGyBw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "215678257693-gtc92o38m01785m09qn6s35874p7rb5j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

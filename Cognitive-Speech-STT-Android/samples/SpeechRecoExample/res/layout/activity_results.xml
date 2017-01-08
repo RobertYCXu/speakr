@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_results"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/view_gradient_background"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.microsoft.CognitiveServicesExample.ResultsActivity">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_marginTop="24dp"
+        android:layout_width="match_parent"
+        android:layout_marginBottom="48dp"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:padding="32dp"
+        android:alpha="0.7">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                style="@style/Base.TextAppearance.AppCompat.Headline"
+                android:textSize="@dimen/results_activity_textview_font_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:text="Score"/>
+            <TextView
+                android:gravity="right"
+                android:id="@+id/results_score_textview"
+                style="@style/Base.TextAppearance.AppCompat.Headline"
+                android:textSize="@dimen/results_activity_textview_font_size"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="42%"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                style="@style/Base.TextAppearance.AppCompat.Headline"
+                android:textSize="@dimen/results_activity_textview_font_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:text="Avg Speed"/>
+            <TextView
+                android:gravity="right"
+                android:id="@+id/results_avg_speed_textview"
+                style="@style/Base.TextAppearance.AppCompat.Headline"
+                android:textSize="@dimen/results_activity_textview_font_size"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="110 WPM"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                style="@style/Base.TextAppearance.AppCompat.Headline"
+                android:textSize="@dimen/results_activity_textview_font_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:text="Filler Words"/>
+            <TextView
+                android:gravity="right"
+                android:id="@+id/results_filler_textview"
+                style="@style/Base.TextAppearance.AppCompat.Headline"
+                android:textSize="@dimen/results_activity_textview_font_size"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="13%"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/activity_results_repeated_layout"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                style="@style/Base.TextAppearance.AppCompat.Headline"
+                android:textSize="@dimen/results_activity_textview_font_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:text="Avoid:"/>
+            <TextView
+                android:gravity="right"
+                android:id="@+id/results_repeated_textview"
+                style="@style/Base.TextAppearance.AppCompat.Headline"
+                android:textSize="@dimen/results_activity_textview_font_size"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Like"/>
+        </LinearLayout>
+
+        <com.jjoe64.graphview.GraphView
+            android:layout_marginTop="20dp"
+            android:id="@+id/results_speed_graph"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+</RelativeLayout>
