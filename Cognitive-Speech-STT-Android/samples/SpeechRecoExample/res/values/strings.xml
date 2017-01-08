@@ -16,4 +16,5 @@
     <string name="results_intent_key_speed">average_speed</string>
     <string name="results_intent_key_repeated_map">repeated_map</string>
     <string name="results_intent_key_filler">filler</string>
+    <string name="results_intent_most_rep">most_repeated</string>
 </resources>

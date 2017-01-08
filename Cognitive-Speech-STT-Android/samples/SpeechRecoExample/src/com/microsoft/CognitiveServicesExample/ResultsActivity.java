@@ -8,7 +8,10 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.FillerWords;
+import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.SpeechAnalysis;
 
 import java.util.HashMap;
 
@@ -18,6 +21,14 @@ public class ResultsActivity extends Activity {
     private HashMap<String, Integer> mRepeatedMap;
     private int mAverageSpeed;
     private int mScore;
+    private String mMostRep = "";
+
+    DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+
+
+//    DatabaseReference mSpeedRef = mRootRef.child(getString(R.string.results_intent_key_speed));
+//    DatabaseReference mFillerwordRef = mRootRef.child(getString(R.string.results_intent_key_filler));
+//    DatabaseReference mScoreRef = mRootRef.child(getString(R.string.results_intent_key_score));
 
     private TextView mMostRepeatedTV, mScoreTV, mAvgSpeedTV, mFillerTV;
 
@@ -52,6 +63,7 @@ public class ResultsActivity extends Activity {
                 }
             }
             mMostRepeatedTV.setText(val);
+            mMostRep = val;
 
         } else {
             repeatedLayout.setVisibility(View.GONE);
@@ -64,5 +76,21 @@ public class ResultsActivity extends Activity {
         mFillerTV.setText(""+mFiller.getPercent()+"%");
         mAvgSpeedTV.setText(mAverageSpeed+" WPM");
         mScoreTV.setText(""+mScore+"%");
+
+        saveData();
+    }
+
+    private void saveData() {
+        DatabaseReference toSubmitNode = mRootRef.child(SpeechAnalysis.getId(mScore));
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put(getString(R.string.results_intent_key_score), ""+mScore);
+        params.put(getString(R.string.results_intent_key_filler), ""+mFiller.getPercent());
+        params.put(getString(R.string.results_intent_key_speed), ""+mAverageSpeed);
+        if (mMostRep != null && mMostRep != ""){
+            params.put(getString(R.string.results_intent_most_rep),mMostRep);
+        }
+
+        toSubmitNode.setValue(params);
     }
 }

@@ -20,7 +20,9 @@ public class Userdata extends AppCompatActivity {
     TextView mscoreData;
 
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
-    DatabaseReference mspeedRef = mRootRef.child("speed");
+
+
+    DatabaseReference mspeedRef = mRootRef.child("speed"));
     DatabaseReference mfillerwordRef = mRootRef.child("fillerword");
     DatabaseReference mscoreRef = mRootRef.child("score");
 

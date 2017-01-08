@@ -7,16 +7,23 @@ repositories {
     }
 }
 dependencies {
+    compile files('/Users/Akshay/Desktop/speakr.io/Cognitive-Speech-STT-Android/SpeechSDK/libs/httpclient-4.5.2.jar')
     compile 'com.microsoft.projectoxford:speechrecognition:1.1.0'
     compile 'com.android.support:design:22.2.0'
-    compile 'com.android.support:appcompat-v7:21+'
+    compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'de.hdodenhof:circleimageview:2.1.0'
-    compile files('/Users/Akshay/Desktop/speakr.io/Cognitive-Speech-STT-Android/SpeechSDK/libs/httpclient-4.5.2.jar')
+    compile 'com.google.firebase:firebase-database:10.0.1'
 }
 
 android {
     compileSdkVersion 21
     buildToolsVersion '21.1.2'
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE-FIREBASE.txt'
+        exclude 'META-INF/NOTICE'
+    }
 
     productFlavors {
         x86 {
@@ -51,3 +58,5 @@ android {
         abortOnError false
     }
 }
+
+apply plugin: 'com.google.gms.google-services'
