@@ -9,6 +9,6 @@
     <string name="luisAppID">yourLuisAppID</string>
     <string name="luisSubscriptionID">49548f18240448b0946dda6a7ece45ef</string>
 
-    <string name="app_name">Project Oxford Speech Recognition Sample</string>
+    <string name="app_name">Speakr</string>
     <string name="action_settings">Settings</string>
 </resources>

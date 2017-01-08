@@ -36,6 +36,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -50,19 +52,17 @@ import com.microsoft.cognitiveservices.speechrecognition.RecognitionResult;
 import com.microsoft.cognitiveservices.speechrecognition.RecognitionStatus;
 import com.microsoft.cognitiveservices.speechrecognition.SpeechRecognitionMode;
 import com.microsoft.cognitiveservices.speechrecognition.SpeechRecognitionServiceFactory;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
+import java.util.Date;
 
 public class MainActivity extends Activity implements ISpeechRecognitionServerEvents
 {
+    private long mRecordingStartTime;
+
     int m_waitSeconds = 0;
     DataRecognitionClient dataClient = null;
     MicrophoneRecognitionClient micClient = null;
     FinalResponseStatus isReceivedResponse = FinalResponseStatus.NotReceived;
     EditText _logText;
-    RadioGroup _radioGroup;
-    Button _buttonSelectMode;
     Button _startButton;
 
     public enum FinalResponseStatus { NotReceived, OK, Timeout }
@@ -95,20 +95,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
      * @return true if [use microphone]; otherwise, false.
      */
     private Boolean getUseMicrophone() {
-        int id = this._radioGroup.getCheckedRadioButtonId();
-        return id == R.id.micIntentRadioButton ||
-                id == R.id.micDictationRadioButton ||
-                id == (R.id.micRadioButton - 1);
-    }
-
-    /**
-     * Gets a value indicating whether LUIS results are desired.
-     * @return true if LUIS results are to be returned otherwise, false.
-     */
-    private Boolean getWantIntent() {
-        int id = this._radioGroup.getCheckedRadioButtonId();
-        return id == R.id.dataShortIntentRadioButton ||
-                id == R.id.micIntentRadioButton;
+        return true;
     }
 
     /**
@@ -116,13 +103,8 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
      * @return The speech recognition mode.
      */
     private SpeechRecognitionMode getMode() {
-        int id = this._radioGroup.getCheckedRadioButtonId();
-        if (id == R.id.micDictationRadioButton ||
-                id == R.id.dataLongRadioButton) {
-            return SpeechRecognitionMode.LongDictation;
-        }
-
-        return SpeechRecognitionMode.ShortPhrase;
+        //ALWAYS RETURN LONG DICTATION
+        return SpeechRecognitionMode.LongDictation;
     }
 
     /**
@@ -133,30 +115,12 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         return "en-us";
     }
 
-    /**
-     * Gets the short wave file path.
-     * @return The short wave file.
-     */
-    private String getShortWaveFile() {
-        return "whatstheweatherlike.wav";
-    }
-
-    /**
-     * Gets the long wave file path.
-     * @return The long wave file.
-     */
-    private String getLongWaveFile() {
-        return "batman.wav";
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         this._logText = (EditText) findViewById(R.id.editText1);
-        this._radioGroup = (RadioGroup)findViewById(R.id.groupMode);
-        this._buttonSelectMode = (Button)findViewById(R.id.buttonSelectMode);
         this._startButton = (Button) findViewById(R.id.button1);
 
         if (getString(R.string.primaryKey).startsWith("Please")) {
@@ -176,61 +140,20 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
             }
         });
 
-        this._buttonSelectMode.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                This.ShowMenu(This._radioGroup.getVisibility() == View.INVISIBLE);
-            }
-        });
-
-        this._radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup rGroup, int checkedId) {
-                This.RadioButton_Click(rGroup, checkedId);
-            }
-        });
-
-        this.ShowMenu(true);
     }
 
-    private void ShowMenu(boolean show) {
-        if (show) {
-            this._radioGroup.setVisibility(View.VISIBLE);
-            this._logText.setVisibility(View.INVISIBLE);
-        } else {
-            this._radioGroup.setVisibility(View.INVISIBLE);
-            this._logText.setText("");
-            this._logText.setVisibility(View.VISIBLE);
-        }
-    }
     /**
      * Handles the Click event of the _startButton control.
      */
     private void StartButton_Click(View arg0) {
         this._startButton.setEnabled(false);
-        this._radioGroup.setEnabled(false);
 
         this.m_waitSeconds = this.getMode() == SpeechRecognitionMode.ShortPhrase ? 20 : 200;
 
-        this.ShowMenu(false);
-
-        this.LogRecognitionStart();
+        Log.wtf("Recog", "recog started");//this.LogRecognitionStart();
 
         if (this.getUseMicrophone()) {
             if (this.micClient == null) {
-                if (this.getWantIntent()) {
-                    this.WriteLine("--- Start microphone dictation with Intent detection ----");
-
-                    this.micClient =
-                            SpeechRecognitionServiceFactory.createMicrophoneClientWithIntent(
-                                    this,
-                                    this.getDefaultLocale(),
-                                    this,
-                                    this.getPrimaryKey(),
-                                    this.getLuisAppId(),
-                                    this.getLuisSubscriptionID());
-                }
-                else
                 {
                     this.micClient = SpeechRecognitionServiceFactory.createMicrophoneClient(
                             this,
@@ -245,18 +168,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         }
         else
         {
-            if (null == this.dataClient) {
-                if (this.getWantIntent()) {
-                    this.dataClient =
-                            SpeechRecognitionServiceFactory.createDataClientWithIntent(
-                                    this,
-                                    this.getDefaultLocale(),
-                                    this,
-                                    this.getPrimaryKey(),
-                                    this.getLuisAppId(),
-                                    this.getLuisSubscriptionID());
-                }
-                else {
+            if (null == this.dataClient) { {
                     this.dataClient = SpeechRecognitionServiceFactory.createDataClient(
                             this,
                             this.getMode(),
@@ -266,36 +178,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
                 }
             }
 
-            this.SendAudioHelper((this.getMode() == SpeechRecognitionMode.ShortPhrase) ? this.getShortWaveFile() : this.getLongWaveFile());
-        }
-    }
 
-    /**
-     * Logs the recognition start.
-     */
-    private void LogRecognitionStart() {
-        String recoSource;
-        if (this.getUseMicrophone()) {
-            recoSource = "microphone";
-        } else if (this.getMode() == SpeechRecognitionMode.ShortPhrase) {
-            recoSource = "short wav file";
-        } else {
-            recoSource = "long wav file";
-        }
-
-        this.WriteLine("\n--- Start speech recognition using " + recoSource + " with " + this.getMode() + " mode in " + this.getDefaultLocale() + " language ----\n\n");
-    }
-
-    private void SendAudioHelper(String filename) {
-        RecognitionTask doDataReco = new RecognitionTask(this.dataClient, this.getMode(), filename);
-        try
-        {
-            doDataReco.execute().get(m_waitSeconds, TimeUnit.SECONDS);
-        }
-        catch (Exception e)
-        {
-            doDataReco.cancel(true);
-            isReceivedResponse = FinalResponseStatus.Timeout;
         }
     }
 
@@ -316,15 +199,18 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         }
 
         if (!isFinalDicationMessage) {
-            this.WriteLine("********* Final n-BEST Results *********");
+            Log.wtf("FINAL RESULTS:","********* Final n-BEST Results *********");
             for (int i = 0; i < response.Results.length; i++) {
-//                This is where the DataProcessed
-//                TODO: instantiate the repeated word, filler word, and speed logic objects
-                this.WriteLine("[" + i + "]" + " Confidence=" + response.Results[i].Confidence +
+                Log.wtf("Result "+(i+1),"[" + i + "]" + " Confidence=" + response.Results[i].Confidence +
                         " Text=\"" + response.Results[i].DisplayText + "\"");
             }
+            //    This is where the DataProcessed
+            //    TODO: instantiate the repeated word, filler word, and speed logic objects
 
-            this.WriteLine();
+            micClient.endMicAndRecognition();
+            _startButton.setEnabled(true);
+
+            String finalPredictedString = response.Results[0].DisplayText;
         }
     }
 
@@ -332,28 +218,22 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
      * Called when a final response is received and its intent is parsed
      */
     public void onIntentReceived(final String payload) {
-        this.WriteLine("--- Intent received by onIntentReceived() ---");
-        this.WriteLine(payload);
-        this.WriteLine();
+        Log.wtf("Intent: ", "--- Intent received by onIntentReceived() ---");
     }
 
     public void onPartialResponseReceived(final String response) {
-        this.WriteLine("--- Partial result received by onPartialResponseReceived() ---");
-//      TODO: check if # of words in this string is the same in prevString, if so, then do nothing.
-//            Else, SAVE TIME and current size of string
-//      ** Also check if > 1 word is added (if response.length - olderStr.length > 1) then set then
-//         divide the time in between be n # of words added to last time!
-        //ArrayList<Long> timeList = new ArrayList<>();
-        this.WriteLine(response);
-        this.WriteLine();
+        Log.wtf("PARTIAL RESPONSE:", "--- Partial result received by onPartialResponseReceived() ---");
+        Log.wtf("RESPONSE: ", response);
+
+
+        //TODO: create new stringspeed object. add response and current time. add to list
     }
 
     public void onError(final int errorCode, final String response) {
         this._startButton.setEnabled(true);
-        this.WriteLine("--- Error received by onError() ---");
-        this.WriteLine("Error code: " + SpeechClientStatus.fromInt(errorCode) + " " + errorCode);
-        this.WriteLine("Error text: " + response);
-        this.WriteLine();
+        Log.wtf("Error", "--- Error received by onError() ---");
+        Log.wtf("Error", "Error code: " + SpeechClientStatus.fromInt(errorCode) + " " + errorCode);
+        Snackbar.make(null, "Error: "+response, Snackbar.LENGTH_LONG).show();
     }
 
     /**
@@ -361,116 +241,18 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
      * @param recording The current recording state
      */
     public void onAudioEvent(boolean recording) {
-        this.WriteLine("--- Microphone status change received by onAudioEvent() ---");
-        this.WriteLine("********* Microphone status: " + recording + " *********");
+        Log.wtf("Recording triggered", "--- Microphone status change received by onAudioEvent() ---");
+        Log.wtf("!!","********* Microphone status: " + recording + " *********");
         if (recording) {
-            this.WriteLine("Please start speaking.");
+            Log.wtf("NOTE","Please start speaking.");
         }
 
-        WriteLine();
+        // do event! SAVE START TIME
+        mRecordingStartTime = new Date().getTime();
+
         if (!recording) {
             this.micClient.endMicAndRecognition();
             this._startButton.setEnabled(true);
-        }
-    }
-
-    /**
-     * Writes the line.
-     */
-    private void WriteLine() {
-        this.WriteLine("");
-    }
-
-    /**
-     * Writes the line.
-     * @param text The line to write.
-     */
-    private void WriteLine(String text) {
-        this._logText.append(text + "\n");
-    }
-
-    /**
-     * Handles the Click event of the RadioButton control.
-     * @param rGroup The radio grouping.
-     * @param checkedId The checkedId.
-     */
-    private void RadioButton_Click(RadioGroup rGroup, int checkedId) {
-        // Reset everything
-        if (this.micClient != null) {
-            this.micClient.endMicAndRecognition();
-            try {
-                this.micClient.finalize();
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
-            }
-            this.micClient = null;
-        }
-
-        if (this.dataClient != null) {
-            try {
-                this.dataClient.finalize();
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
-            }
-            this.dataClient = null;
-        }
-
-        this.ShowMenu(false);
-        this._startButton.setEnabled(true);
-    }
-
-    /*
-     * Speech recognition with data (for example from a file or audio source).  
-     * The data is broken up into buffers and each buffer is sent to the Speech Recognition Service.
-     * No modification is done to the buffers, so the user can apply their
-     * own VAD (Voice Activation Detection) or Silence Detection
-     * 
-     * @param dataClient
-     * @param recoMode
-     * @param filename
-     */
-    private class RecognitionTask extends AsyncTask<Void, Void, Void> {
-        DataRecognitionClient dataClient;
-        SpeechRecognitionMode recoMode;
-        String filename;
-
-        RecognitionTask(DataRecognitionClient dataClient, SpeechRecognitionMode recoMode, String filename) {
-            this.dataClient = dataClient;
-            this.recoMode = recoMode;
-            this.filename = filename;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                // Note for wave files, we can just send data from the file right to the server.
-                // In the case you are not an audio file in wave format, and instead you have just
-                // raw data (for example audio coming over bluetooth), then before sending up any 
-                // audio data, you must first send up an SpeechAudioFormat descriptor to describe 
-                // the layout and format of your raw audio data via DataRecognitionClient's sendAudioFormat() method.
-                // String filename = recoMode == SpeechRecognitionMode.ShortPhrase ? "whatstheweatherlike.wav" : "batman.wav";
-                InputStream fileStream = getAssets().open(filename);
-                int bytesRead = 0;
-                byte[] buffer = new byte[1024];
-
-                do {
-                    // Get  Audio data to send into byte buffer.
-                    bytesRead = fileStream.read(buffer);
-
-                    if (bytesRead > -1) {
-                        // Send of audio data to service. 
-                        dataClient.sendAudio(buffer, bytesRead);
-                    }
-                } while (bytesRead > 0);
-
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
-            }
-            finally {
-                dataClient.endAudio();
-            }
-
-            return null;
         }
     }
 }
