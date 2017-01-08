@@ -109,6 +109,12 @@
                 android:text="Like"/>
         </LinearLayout>
 
+        <com.jjoe64.graphview.GraphView
+            android:layout_marginTop="20dp"
+            android:id="@+id/results_speed_graph"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
     </LinearLayout>
 
 </RelativeLayout>

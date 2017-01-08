@@ -10,9 +10,13 @@ import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.FillerWords;
 import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.SpeechAnalysis;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ResultsActivity extends Activity {
@@ -22,6 +26,8 @@ public class ResultsActivity extends Activity {
     private int mAverageSpeed;
     private int mScore;
     private String mMostRep = "";
+    private ArrayList<Integer> mSpeedList;
+    private GraphView graphView;
 
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
@@ -72,12 +78,27 @@ public class ResultsActivity extends Activity {
         mFiller = (FillerWords) intent.getExtras().get(getString(R.string.results_intent_key_filler));
         mAverageSpeed = intent.getExtras().getInt(getString(R.string.results_intent_key_speed));
         mScore = intent.getExtras().getInt(getString(R.string.results_intent_key_score));
+        mSpeedList = intent.getExtras().getIntegerArrayList(getString(R.string.results_intent_key_moving_speed));
 
         mFillerTV.setText(""+mFiller.getPercent()+"%");
         mAvgSpeedTV.setText(mAverageSpeed+" WPM");
         mScoreTV.setText(""+mScore+"%");
 
         saveData();
+
+
+        //graph the mSpeedList data!
+
+        int size = mSpeedList.size();
+
+
+        graphView = (GraphView)findViewById(R.id.results_speed_graph);
+        ArrayList<DataPoint> dataPoints = new ArrayList<>();
+        for (int i = 0; i < size; i++){
+            dataPoints.add(new DataPoint(i*3, mSpeedList.get(i)));
+        }
+        LineGraphSeries<DataPoint> graphSeries = new LineGraphSeries<>((DataPoint[]) dataPoints.toArray(new DataPoint[size]));
+        graphView.addSeries(graphSeries);
     }
 
     private void saveData() {

@@ -304,6 +304,8 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
                 final int score = ScoreLogic.getScore(finalPredictedString, map, fillerWords.getPercent(), speed);
                 Log.wtf("FINAL SCORE", "Score is: "+score);
 
+                final ArrayList<Integer> lettersPerThreeSeconds = StringSpeed.getTimeData(mSpeedList);
+
                 mViewResults.setVisibility(View.VISIBLE);
                 mViewResults.setEnabled(true);
                 mViewResults.animate()
@@ -321,6 +323,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
                         resultsIntent.putExtra(getString(R.string.results_intent_key_speed), speed);
                         resultsIntent.putExtra(getString(R.string.results_intent_key_repeated_map), map);
                         resultsIntent.putExtra(getString(R.string.results_intent_key_filler), fillerWords);
+                        resultsIntent.putExtra(getString(R.string.results_intent_key_moving_speed), lettersPerThreeSeconds);
 
                         startActivityForResult(resultsIntent, 0000);
                     }
