@@ -7,9 +7,11 @@ repositories {
     }
 }
 dependencies {
+    compile 'com.microsoft.projectoxford:emotion:1.0.0'
     compile 'com.microsoft.projectoxford:speechrecognition:1.1.0'
     compile 'com.android.support:design:22.2.0'
     compile 'com.android.support:appcompat-v7:21+'
+    compile files('C:/Users/kody_/AndroidStudioProjects/speakr.io/Cognitive-Speech-STT-Android/SpeechSDK/libs/httpclient-4.5.2.jar')
 }
 
 android {

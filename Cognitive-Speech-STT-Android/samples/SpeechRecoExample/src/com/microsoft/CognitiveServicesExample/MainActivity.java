@@ -34,6 +34,7 @@ package com.microsoft.CognitiveServicesExample;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -41,6 +42,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 
+import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.CameraView;
+import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.FacialRecognition;
 import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.FillerWords;
 import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.RepeatedWords;
 import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.StringSpeed;
@@ -53,14 +56,23 @@ import com.microsoft.cognitiveservices.speechrecognition.RecognitionStatus;
 import com.microsoft.cognitiveservices.speechrecognition.SpeechRecognitionMode;
 import com.microsoft.cognitiveservices.speechrecognition.SpeechRecognitionServiceFactory;
 
+import org.apache.http.HttpEntity;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
+@SuppressWarnings("deprecation")
 public class MainActivity extends Activity implements ISpeechRecognitionServerEvents
 {
     private long mRecordingStartTime;
+    private Camera mCamera = null;
+    private CameraView mCameraView = null;
+    private byte[] imageData = null;
+    private HttpEntity emotions = null;
 
     int m_waitSeconds = 200;
     ArrayList<StringSpeed> mSpeedList;
@@ -125,6 +137,12 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         setContentView(R.layout.activity_main);
         this._startButton = (FloatingActionButton) findViewById(R.id.button1);
 
+        try{
+            mCamera = Camera.open();//you can use open(int) to use different cameras
+        } catch (Exception e){
+            Log.d("ERROR", "Failed to get camera: " + e.getMessage());
+        }
+
         if (getString(R.string.primaryKey).startsWith("Please")) {
             new AlertDialog.Builder(this)
                     .setTitle(getString(R.string.add_subscription_key_tip_title))
@@ -151,9 +169,23 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         this._startButton.setEnabled(false);
 
         Log.wtf("Recog", "recog started");//this.LogRecognitionStart();
+        /*
         if (!mSpeedList.isEmpty()){
             mSpeedList.clear();
         }
+        */
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                mCamera.startPreview();
+                mCamera.takePicture(null, null, mPicture);
+                emotions = FacialRecognition.faceRec(imageData);
+                System.out.println(emotions);
+            }
+        }, 0, 1000);
 
         if (this.getUseMicrophone()) {
             if (this.micClient == null) {
@@ -182,6 +214,15 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
             }
         }
     }
+
+    Camera.PictureCallback mPicture = new Camera.PictureCallback() {
+        @Override
+        public void onPictureTaken(byte[] data, Camera camera) {
+            imageData = data.clone();
+            return;
+        }
+
+    };
 
     public void onFinalResponseReceived(final RecognitionResult response) {
         boolean isFinalDicationMessage = this.getMode() == SpeechRecognitionMode.LongDictation &&
