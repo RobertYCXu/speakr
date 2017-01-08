@@ -43,6 +43,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.FillerWords;
 import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.StringSpeed;
 import com.microsoft.bing.speech.SpeechClientStatus;
 import com.microsoft.cognitiveservices.speechrecognition.DataRecognitionClient;
@@ -207,6 +208,8 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
             Log.wtf("Overall speed", ""+StringSpeed.overallSpeed(
                     mRecordingStartTime, new Date().getTime(),
                     finalPredictedString));
+            FillerWords fillerWords = new FillerWords(finalPredictedString);
+            Log.wtf("filler word percentage", ""+fillerWords.getPercent());
         }
     }
 
