@@ -50,6 +50,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.FillerWords;
 import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.RepeatedWords;
@@ -83,6 +84,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
     Button mHistoryButton;
     Button mLogoutButton;
     View mDimView;
+    TextView mLiveParseTV;
     Button mViewResults;
     Boolean mCurrentlyDimmed = false;
 
@@ -145,6 +147,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         this.mDimView = findViewById(R.id.dim_view);
         this.mViewResults = (Button)findViewById(R.id.button_view_results);
         this.mLogoutButton = (Button)findViewById(R.id.button_logout);
+        this.mLiveParseTV = (TextView)findViewById(R.id.activity_main_live_parse_tv);
 
         if (getString(R.string.primaryKey).startsWith("Please")) {
             new AlertDialog.Builder(this)
@@ -267,6 +270,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         }
 
         if (!isFinalDicationMessage) {
+            mLiveParseTV.setText("");
             Log.wtf("FINAL RESULTS:","********* Final n-BEST Results *********");
             for (int i = 0; i < response.Results.length; i++) {
                 Log.wtf("Result "+(i+1),"[" + i + "]" + " Confidence=" + response.Results[i].Confidence +
@@ -344,6 +348,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         Log.wtf("PARTIAL RESPONSE:", "--- Partial result received by onPartialResponseReceived() ---");
         Log.wtf("RESPONSE: ", response);
 
+        mLiveParseTV.setText(response);
 
         //create new stringspeed object. add response and current time. add to list
         StringSpeed speed = new StringSpeed(response, new Date().getTime());
