@@ -14,6 +14,9 @@ public class FillerWords {
     private int percent = 0;
 
     public FillerWords(String text){
+        text.toLowerCase();
+        text.replace('.',' ');
+
         numUm = countFill("um", text);
         numLike = countFill("like", text);
         numSo = countFill("so", text);

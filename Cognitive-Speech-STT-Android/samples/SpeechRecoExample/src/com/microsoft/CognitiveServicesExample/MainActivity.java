@@ -32,17 +32,27 @@
  */
 package com.microsoft.CognitiveServicesExample;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.LinearInterpolator;
+import android.widget.Button;
 
 import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.FillerWords;
 import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.RepeatedWords;
+import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.ScoreLogic;
 import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.StringSpeed;
 import com.microsoft.bing.speech.SpeechClientStatus;
 import com.microsoft.cognitiveservices.speechrecognition.DataRecognitionClient;
@@ -56,6 +66,7 @@ import com.microsoft.cognitiveservices.speechrecognition.SpeechRecognitionServic
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class MainActivity extends Activity implements ISpeechRecognitionServerEvents
@@ -63,11 +74,16 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
     private long mRecordingStartTime;
 
     int m_waitSeconds = 200;
-    ArrayList<StringSpeed> mSpeedList;
+    ArrayList<StringSpeed> mSpeedList = new ArrayList<>();
     DataRecognitionClient dataClient = null;
     MicrophoneRecognitionClient micClient = null;
     FinalResponseStatus isReceivedResponse = FinalResponseStatus.NotReceived;
-    FloatingActionButton _startButton;
+    Button mRecordButton;
+    Button mHistoryButton;
+    Button mLogoutButton;
+    View mDimView;
+    Button mViewResults;
+    Boolean mCurrentlyDimmed = false;
 
     public enum FinalResponseStatus { NotReceived, OK, Timeout }
 
@@ -123,7 +139,11 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        this._startButton = (FloatingActionButton) findViewById(R.id.button1);
+        this.mRecordButton = (Button) findViewById(R.id.button1);
+        this.mHistoryButton = (Button)findViewById(R.id.button_history);
+        this.mDimView = findViewById(R.id.dim_view);
+        this.mViewResults = (Button)findViewById(R.id.button_view_results);
+        this.mLogoutButton = (Button)findViewById(R.id.button_logout);
 
         if (getString(R.string.primaryKey).startsWith("Please")) {
             new AlertDialog.Builder(this)
@@ -135,7 +155,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
 
         // setup the buttons
         final MainActivity This = this;
-        this._startButton.setOnClickListener(new OnClickListener() {
+        this.mRecordButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
                 This.StartButton_Click(arg0);
@@ -145,15 +165,19 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
     }
 
     /**
-     * Handles the Click event of the _startButton control.
+     * Handles the Click event of the mRecordButton control.
      */
     private void StartButton_Click(View arg0) {
-        this._startButton.setEnabled(false);
+        this.mRecordButton.setEnabled(false);
 
         Log.wtf("Recog", "recog started");//this.LogRecognitionStart();
-        if (!mSpeedList.isEmpty()){
+        if (mSpeedList != null && !mSpeedList.isEmpty()){
             mSpeedList.clear();
         }
+
+        //dim screen
+        animateRecord(1);
+
 
         if (this.getUseMicrophone()) {
             if (this.micClient == null) {
@@ -183,6 +207,48 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         }
     }
 
+    private void animateRecord(int inputNum) {
+        //input 1 if starting recording
+        //input 0 if ending
+        AnimatorSet animationSet = new AnimatorSet();
+        List<Animator> animationList = new ArrayList<>();
+
+        ObjectAnimator viewDimmer, recordDimmer, historyDimmer, logoutDimmer;
+        if (inputNum == 1){
+            mCurrentlyDimmed = true;
+            //here
+            viewDimmer = ObjectAnimator.ofFloat(mDimView, "alpha", 0, 0.8f);
+            recordDimmer = ObjectAnimator.ofFloat(mRecordButton, "alpha", 1f, 0.2f);
+            historyDimmer = ObjectAnimator.ofFloat(mHistoryButton, "alpha", 1f, 0.2f);
+            logoutDimmer = ObjectAnimator.ofFloat(mLogoutButton, "alpha", 1f, 0.2f);
+        } else {
+            mCurrentlyDimmed = false;
+            //here
+            viewDimmer = ObjectAnimator.ofFloat(mDimView, "alpha", 0.8f, 0);
+            recordDimmer = ObjectAnimator.ofFloat(mRecordButton, "alpha", 0.2f, 1);
+            historyDimmer = ObjectAnimator.ofFloat(mHistoryButton, "alpha", 0.2f, 1);
+            logoutDimmer = ObjectAnimator.ofFloat(mLogoutButton, "alpha", 0.2f, 1f);
+        }
+        viewDimmer.setDuration(100);
+        viewDimmer.setInterpolator(new LinearInterpolator());
+        animationList.add(viewDimmer);
+
+        recordDimmer.setDuration(100);
+        recordDimmer.setInterpolator(new LinearInterpolator());
+        animationList.add(recordDimmer);
+
+        historyDimmer.setDuration(100);
+        historyDimmer.setInterpolator(new LinearInterpolator());
+        animationList.add(historyDimmer);
+
+        logoutDimmer.setDuration(100);
+        logoutDimmer.setInterpolator(new LinearInterpolator());
+        animationList.add(logoutDimmer);
+
+        animationSet.playTogether(animationList);
+        animationSet.start();
+    }
+
     public void onFinalResponseReceived(final RecognitionResult response) {
         boolean isFinalDicationMessage = this.getMode() == SpeechRecognitionMode.LongDictation &&
                 (response.RecognitionStatus == RecognitionStatus.EndOfDictation ||
@@ -196,7 +262,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
 
         if (isFinalDicationMessage) {
             micClient.endMicAndRecognition();
-            this._startButton.setEnabled(true);
+            this.mRecordButton.setEnabled(true);
             this.isReceivedResponse = FinalResponseStatus.OK;
         }
 
@@ -209,7 +275,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
             //    This is where the DataProcessed
 
             micClient.endMicAndRecognition();
-            _startButton.setEnabled(true);
+            mRecordButton.setEnabled(true);
 
             if (response.Results.length > 0){
                 //    instantiate the repeated word, filler word, and speed logic objects
@@ -217,9 +283,10 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
                 //TODO: get live speed graph data (array)
 
                 String finalPredictedString = response.Results[0].DisplayText;
-                Log.wtf("Overall speed", ""+StringSpeed.overallSpeed(
+                int speed = StringSpeed.overallSpeed(
                         mRecordingStartTime, new Date().getTime(),
-                        finalPredictedString));
+                        finalPredictedString);
+                Log.wtf("Overall speed", ""+speed);
                 FillerWords fillerWords = new FillerWords(finalPredictedString);
                 Log.wtf("filler percentage", ""+fillerWords.getPercent());
                 HashMap<String, Integer> map = RepeatedWords.retWordFreq(finalPredictedString);
@@ -229,6 +296,22 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
                 for (String repWord : map.keySet()){
                     Log.wtf("REP WORD DATA", repWord+": "+map.get(repWord));
                 }
+
+                int score = ScoreLogic.getScore(finalPredictedString, map, fillerWords.getPercent(), speed);
+                Log.wtf("FINAL SCORE", "Score is: "+score);
+
+                mViewResults.setVisibility(View.VISIBLE);
+                mViewResults.animate()
+                        .alpha(1)
+                        .setDuration(100)
+                        .setInterpolator(new AccelerateInterpolator()).start();
+                mViewResults.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        //TODO: GO TO RESULTS ACTIVITY
+                        Log.wtf("Results selected", "go to results");
+                    }
+                });
             }
         }
     }
@@ -252,7 +335,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
     }
 
     public void onError(final int errorCode, final String response) {
-        this._startButton.setEnabled(true);
+        this.mRecordButton.setEnabled(true);
         Log.wtf("Error", "--- Error received by onError() ---");
         Log.wtf("Error", "Error code: " + SpeechClientStatus.fromInt(errorCode) + " " + errorCode);
         Snackbar.make(null, "Error: "+response, Snackbar.LENGTH_LONG).show();
@@ -274,7 +357,18 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         if (!recording) {
             //ENDED!
             this.micClient.endMicAndRecognition();
-            this._startButton.setEnabled(true);
+            this.mRecordButton.setEnabled(true);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mCurrentlyDimmed){
+            mViewResults.setEnabled(false);
+            mViewResults.setAlpha(0);
+            animateRecord(0);
+        } else {
+            super.onBackPressed();
         }
     }
 }
