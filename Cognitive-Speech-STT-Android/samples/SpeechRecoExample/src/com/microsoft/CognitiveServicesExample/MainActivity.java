@@ -40,9 +40,9 @@ import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.EditText;
 
+import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.FillerWords;
+import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.RepeatedWords;
 import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.StringSpeed;
 import com.microsoft.bing.speech.SpeechClientStatus;
 import com.microsoft.cognitiveservices.speechrecognition.DataRecognitionClient;
@@ -52,13 +52,18 @@ import com.microsoft.cognitiveservices.speechrecognition.RecognitionResult;
 import com.microsoft.cognitiveservices.speechrecognition.RecognitionStatus;
 import com.microsoft.cognitiveservices.speechrecognition.SpeechRecognitionMode;
 import com.microsoft.cognitiveservices.speechrecognition.SpeechRecognitionServiceFactory;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+
 
 public class MainActivity extends Activity implements ISpeechRecognitionServerEvents
 {
     private long mRecordingStartTime;
 
     int m_waitSeconds = 200;
+    ArrayList<StringSpeed> mSpeedList;
     DataRecognitionClient dataClient = null;
     MicrophoneRecognitionClient micClient = null;
     FinalResponseStatus isReceivedResponse = FinalResponseStatus.NotReceived;
@@ -146,6 +151,9 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         this._startButton.setEnabled(false);
 
         Log.wtf("Recog", "recog started");//this.LogRecognitionStart();
+        if (!mSpeedList.isEmpty()){
+            mSpeedList.clear();
+        }
 
         if (this.getUseMicrophone()) {
             if (this.micClient == null) {
@@ -187,6 +195,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         }
 
         if (isFinalDicationMessage) {
+            micClient.endMicAndRecognition();
             this._startButton.setEnabled(true);
             this.isReceivedResponse = FinalResponseStatus.OK;
         }
@@ -198,15 +207,29 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
                         " Text=\"" + response.Results[i].DisplayText + "\"");
             }
             //    This is where the DataProcessed
-            //    TODO: instantiate the repeated word, filler word, and speed logic objects
 
             micClient.endMicAndRecognition();
             _startButton.setEnabled(true);
 
-            String finalPredictedString = response.Results[0].DisplayText;
-            Log.wtf("Overall speed", ""+StringSpeed.overallSpeed(
-                    mRecordingStartTime, new Date().getTime(),
-                    finalPredictedString));
+            if (response.Results.length > 0){
+                //    instantiate the repeated word, filler word, and speed logic objects
+                //TODO: PUBLISH TO UI
+                //TODO: get live speed graph data (array)
+
+                String finalPredictedString = response.Results[0].DisplayText;
+                Log.wtf("Overall speed", ""+StringSpeed.overallSpeed(
+                        mRecordingStartTime, new Date().getTime(),
+                        finalPredictedString));
+                FillerWords fillerWords = new FillerWords(finalPredictedString);
+                Log.wtf("filler percentage", ""+fillerWords.getPercent());
+                HashMap<String, Integer> map = RepeatedWords.retWordFreq(finalPredictedString);
+                if (map.isEmpty()){
+                    Log.wtf("NO repeated words", "no repeated data");
+                }
+                for (String repWord : map.keySet()){
+                    Log.wtf("REP WORD DATA", repWord+": "+map.get(repWord));
+                }
+            }
         }
     }
 
@@ -222,7 +245,10 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         Log.wtf("RESPONSE: ", response);
 
 
-        //TODO: create new stringspeed object. add response and current time. add to list
+        //create new stringspeed object. add response and current time. add to list
+        StringSpeed speed = new StringSpeed(response, new Date().getTime());
+        Log.wtf("Speed Data Added", "String with time = "+speed.time);
+        mSpeedList.add(speed);
     }
 
     public void onError(final int errorCode, final String response) {
@@ -247,7 +273,6 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
 
         if (!recording) {
             //ENDED!
-            //TODO: test logic
             this.micClient.endMicAndRecognition();
             this._startButton.setEnabled(true);
         }
