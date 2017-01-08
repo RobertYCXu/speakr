@@ -175,7 +175,6 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         if (mSpeedList != null && !mSpeedList.isEmpty()){
             mSpeedList.clear();
         }
-
         //dim screen
         animateRecord(1);
 
@@ -302,6 +301,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
                 Log.wtf("FINAL SCORE", "Score is: "+score);
 
                 mViewResults.setVisibility(View.VISIBLE);
+                mViewResults.setEnabled(true);
                 mViewResults.animate()
                         .alpha(1)
                         .setDuration(100)

@@ -16,8 +16,9 @@ public class FillerWords implements Serializable {
     private int percent = 0;
 
     public FillerWords(String text){
-        text.toLowerCase();
-        text.replace('.',' ');
+        text = text.toLowerCase();
+        text = text.replace('.',' ');
+        text = text.replace(',',' ');
 
         numUm = countFill("um", text);
         numLike = countFill("like", text);

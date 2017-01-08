@@ -9,8 +9,9 @@ import java.util.HashMap;
 
 public class RepeatedWords {
     public static ArrayList<String> retArrayList(String in){
-        in.toLowerCase();
-        in.replace('.',' ');
+        in = in.toLowerCase();
+        in = in.replace('.',' ');
+        in = in.replace(',',' ');
 
         ArrayList<String> ret = new ArrayList<String>();
         int last=0;
