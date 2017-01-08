@@ -10,8 +10,41 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.robbyxu.firebase.Userdata">
 
-    <TextView
+    <Button
+        android:text="stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:layout_centerHorizontal="true"
+        android:id="@+id/button2" />
+
+    <TextView
+        android:text="speed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/speedData"
+        android:layout_marginTop="162dp"
+        android:layout_below="@+id/button2"
+        android:layout_toStartOf="@+id/button2" />
+
+    <TextView
+        android:text="fillerword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/speedData"
+        android:layout_alignRight="@+id/button2"
+        android:layout_alignEnd="@+id/button2"
+        android:layout_marginRight="75dp"
+        android:layout_marginEnd="75dp"
+        android:layout_marginTop="29dp"
+        android:id="@+id/fillerwordData" />
+
+    <TextView
+        android:text="score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/fillerwordData"
+        android:layout_alignLeft="@+id/speedData"
+        android:layout_alignStart="@+id/speedData"
+        android:layout_marginBottom="38dp"
+        android:id="@+id/scoreData" />
 </RelativeLayout>
