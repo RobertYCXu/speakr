@@ -1,10 +1,12 @@
 package com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic;
 
+import java.io.Serializable;
+
 /**
  * Created by Akshay on 2017-01-07.
  */
 
-public class FillerWords {
+public class FillerWords implements Serializable {
     private int numUm = 0;
     private int numLike = 0;
     private int numSo = 0;

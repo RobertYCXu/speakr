@@ -11,4 +11,9 @@
 
     <string name="app_name">Speakr</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_results">ResultsActivity</string>
+    <string name="results_intent_key_score">score</string>
+    <string name="results_intent_key_speed">average_speed</string>
+    <string name="results_intent_key_repeated_map">repeated_map</string>
+    <string name="results_intent_key_filler">filler</string>
 </resources>

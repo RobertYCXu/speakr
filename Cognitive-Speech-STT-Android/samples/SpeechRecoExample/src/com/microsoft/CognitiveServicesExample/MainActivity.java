@@ -37,6 +37,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -283,13 +284,13 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
                 //TODO: get live speed graph data (array)
 
                 String finalPredictedString = response.Results[0].DisplayText;
-                int speed = StringSpeed.overallSpeed(
+                final int speed = StringSpeed.overallSpeed(
                         mRecordingStartTime, new Date().getTime(),
                         finalPredictedString);
                 Log.wtf("Overall speed", ""+speed);
-                FillerWords fillerWords = new FillerWords(finalPredictedString);
+                final FillerWords fillerWords = new FillerWords(finalPredictedString);
                 Log.wtf("filler percentage", ""+fillerWords.getPercent());
-                HashMap<String, Integer> map = RepeatedWords.retWordFreq(finalPredictedString);
+                final HashMap<String, Integer> map = RepeatedWords.retWordFreq(finalPredictedString);
                 if (map.isEmpty()){
                     Log.wtf("NO repeated words", "no repeated data");
                 }
@@ -297,7 +298,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
                     Log.wtf("REP WORD DATA", repWord+": "+map.get(repWord));
                 }
 
-                int score = ScoreLogic.getScore(finalPredictedString, map, fillerWords.getPercent(), speed);
+                final int score = ScoreLogic.getScore(finalPredictedString, map, fillerWords.getPercent(), speed);
                 Log.wtf("FINAL SCORE", "Score is: "+score);
 
                 mViewResults.setVisibility(View.VISIBLE);
@@ -310,10 +311,26 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
                     public void onClick(View view) {
                         //TODO: GO TO RESULTS ACTIVITY
                         Log.wtf("Results selected", "go to results");
+
+                        Intent resultsIntent = new Intent(MainActivity.this, ResultsActivity.class);
+                        resultsIntent.putExtra(getString(R.string.results_intent_key_score), score);
+                        resultsIntent.putExtra(getString(R.string.results_intent_key_speed), speed);
+                        resultsIntent.putExtra(getString(R.string.results_intent_key_repeated_map), map);
+                        resultsIntent.putExtra(getString(R.string.results_intent_key_filler), fillerWords);
+
+                        startActivityForResult(resultsIntent, 0000);
                     }
                 });
             }
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (mCurrentlyDimmed){
+            onBackPressed();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     /**

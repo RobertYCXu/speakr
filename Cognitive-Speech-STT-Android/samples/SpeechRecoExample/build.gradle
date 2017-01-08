@@ -11,6 +11,7 @@ dependencies {
     compile 'com.android.support:design:22.2.0'
     compile 'com.android.support:appcompat-v7:21+'
     compile 'de.hdodenhof:circleimageview:2.1.0'
+    compile files('/Users/Akshay/Desktop/speakr.io/Cognitive-Speech-STT-Android/SpeechSDK/libs/httpclient-4.5.2.jar')
 }
 
 android {
