@@ -11,15 +11,21 @@
     android:background="@drawable/view_gradient_background"
     tools:context="com.microsoft.CognitiveServicesExample.HistoryActivity">
 
+    <View
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="48dp"
+        android:layout_width="match_parent"
+        android:background="@android:color/white"
+        android:layout_height="match_parent"/>
+
     <android.support.v7.widget.RecyclerView
         android:layout_marginTop="24dp"
         android:layout_width="match_parent"
         android:layout_marginBottom="48dp"
         android:layout_height="match_parent"
         android:background="@android:color/white"
-        android:padding="32dp"
         android:id="@+id/history_recyclerview"
-        android:alpha="0.7">
+        android:alpha="0">
 
     </android.support.v7.widget.RecyclerView>
 

@@ -13,6 +13,13 @@ public class SpeechAnalysis {
     private String mMostRepeated;
     private String mId;
 
+    public SpeechAnalysis(String percFil, String percScore, String speed, String mostRep){
+        mPercentFiller = Integer.parseInt(percFil);
+        mPercentScore = Integer.parseInt(percScore);
+        mSpeed = Integer.parseInt(speed);
+        mMostRepeated = mostRep;
+    }
+
     public SpeechAnalysis(int percFil, int percScore, int speed, String mostRep){
         mPercentFiller = percFil;
         mPercentScore = percScore;
