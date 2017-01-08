@@ -34,16 +34,17 @@ package com.microsoft.CognitiveServicesExample;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioGroup;
 
+import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.FillerWords;
+import com.microsoft.CognitiveServicesExample.SpeechAnalysisLogic.StringSpeed;
 import com.microsoft.bing.speech.SpeechClientStatus;
 import com.microsoft.cognitiveservices.speechrecognition.DataRecognitionClient;
 import com.microsoft.cognitiveservices.speechrecognition.ISpeechRecognitionServerEvents;
@@ -58,12 +59,11 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
 {
     private long mRecordingStartTime;
 
-    int m_waitSeconds = 0;
+    int m_waitSeconds = 200;
     DataRecognitionClient dataClient = null;
     MicrophoneRecognitionClient micClient = null;
     FinalResponseStatus isReceivedResponse = FinalResponseStatus.NotReceived;
-    EditText _logText;
-    Button _startButton;
+    FloatingActionButton _startButton;
 
     public enum FinalResponseStatus { NotReceived, OK, Timeout }
 
@@ -119,9 +119,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        this._logText = (EditText) findViewById(R.id.editText1);
-        this._startButton = (Button) findViewById(R.id.button1);
+        this._startButton = (FloatingActionButton) findViewById(R.id.button1);
 
         if (getString(R.string.primaryKey).startsWith("Please")) {
             new AlertDialog.Builder(this)
@@ -147,8 +145,6 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
      */
     private void StartButton_Click(View arg0) {
         this._startButton.setEnabled(false);
-
-        this.m_waitSeconds = this.getMode() == SpeechRecognitionMode.ShortPhrase ? 20 : 200;
 
         Log.wtf("Recog", "recog started");//this.LogRecognitionStart();
 
@@ -177,8 +173,6 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
                             this.getPrimaryKey());
                 }
             }
-
-
         }
     }
 
@@ -211,6 +205,11 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
             _startButton.setEnabled(true);
 
             String finalPredictedString = response.Results[0].DisplayText;
+            Log.wtf("Overall speed", ""+StringSpeed.overallSpeed(
+                    mRecordingStartTime, new Date().getTime(),
+                    finalPredictedString));
+            FillerWords fillerWords = new FillerWords(finalPredictedString);
+            Log.wtf("filler word percentage", ""+fillerWords.getPercent());
         }
     }
 
@@ -245,12 +244,13 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         Log.wtf("!!","********* Microphone status: " + recording + " *********");
         if (recording) {
             Log.wtf("NOTE","Please start speaking.");
+            // do event! SAVE START TIME
+            mRecordingStartTime = new Date().getTime();
         }
 
-        // do event! SAVE START TIME
-        mRecordingStartTime = new Date().getTime();
-
         if (!recording) {
+            //ENDED!
+            //TODO: test logic
             this.micClient.endMicAndRecognition();
             this._startButton.setEnabled(true);
         }
