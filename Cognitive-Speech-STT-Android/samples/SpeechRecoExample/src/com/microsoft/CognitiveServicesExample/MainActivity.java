@@ -51,7 +51,6 @@ import com.microsoft.cognitiveservices.speechrecognition.RecognitionStatus;
 import com.microsoft.cognitiveservices.speechrecognition.SpeechRecognitionMode;
 import com.microsoft.cognitiveservices.speechrecognition.SpeechRecognitionServiceFactory;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends Activity implements ISpeechRecognitionServerEvents
