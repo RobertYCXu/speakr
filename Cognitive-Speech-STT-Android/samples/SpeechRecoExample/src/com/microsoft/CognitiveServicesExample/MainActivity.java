@@ -166,6 +166,16 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
             }
         });
 
+        mHistoryButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!mCurrentlyDimmed){
+                    Intent i = new Intent(MainActivity.this, HistoryActivity.class);
+                    startActivity(i);
+                }
+            }
+        });
+
     }
 
     /**

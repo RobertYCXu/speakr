@@ -18,4 +18,5 @@
     <string name="results_intent_key_filler">filler</string>
     <string name="results_intent_most_rep">most_repeated</string>
     <string name="results_intent_key_moving_speed">moving_speed</string>
+    <string name="title_activity_history">History</string>
 </resources>

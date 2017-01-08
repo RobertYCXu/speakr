@@ -33,6 +33,10 @@ public class SpeechAnalysis {
         return mMostRepeated;
     }
 
+    public int getmSpeed() {
+        return mSpeed;
+    }
+
     public String getmId() {
         return mId;
     }
